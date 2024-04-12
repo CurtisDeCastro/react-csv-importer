@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useDrag } from '@use-gesture/react';
+import { Grid } from '@material-ui/core';
 
 import { FieldAssignmentMap } from '../../parser';
 import { FileStepState } from '../file-step/FileStep';
@@ -248,58 +249,70 @@ export const FieldsStep: React.FC<{
   }, [fieldAssignments]);
 
   return (
-    <ImporterFrame
-      fileName={fileState.file.name}
-      subtitle={l10n.stepSubtitle}
-      error={validationError}
-      onCancel={onCancel}
-      onNext={() => {
-        // mark all fields as touched (to show all the errors now)
-        const fullTouchedMap: typeof fieldTouched = {};
-        fields.forEach((field) => {
-          fullTouchedMap[field.name] = true;
-        });
-        setFieldTouched(fullTouchedMap);
-
-        // submit if validation succeeds
-        const hasUnassignedRequired = fields.some(
-          (field) =>
-            !field.isOptional && fieldAssignments[field.name] === undefined
-        );
-
-        if (!hasUnassignedRequired) {
-          onAccept();
-        } else {
-          setValidationError(l10n.requiredFieldsError);
-        }
-      }}
-      nextLabel={l10n.nextButton}
+    <Grid
+      container
+      direction="column"
+      style={{ height: '100%', border: '1px solid red' }}
     >
-      <ColumnDragSourceArea
-        columns={columns}
-        columnPageSize={displayColumnPageSize}
-        fieldAssignments={fieldAssignments}
-        dragState={dragState}
-        eventBinder={bindDrag}
-        onSelect={columnSelectHandler}
-        onUnassign={unassignHandler}
-      />
+      <ImporterFrame
+        fileName={fileState.file.name}
+        subtitle={l10n.stepSubtitle}
+        error={validationError}
+        onCancel={onCancel}
+        onNext={() => {
+          // mark all fields as touched (to show all the errors now)
+          const fullTouchedMap: typeof fieldTouched = {};
+          fields.forEach((field) => {
+            fullTouchedMap[field.name] = true;
+          });
+          setFieldTouched(fullTouchedMap);
 
-      <ColumnDragTargetArea
-        hasHeaders={fileState.hasHeaders}
-        fieldRowSize={displayFieldRowSize}
-        fields={fields}
-        columns={columns}
-        fieldTouched={fieldTouched}
-        fieldAssignments={fieldAssignments}
-        dragState={dragState}
-        eventBinder={bindDrag}
-        onHover={dragHoverHandler}
-        onAssign={assignHandler}
-        onUnassign={unassignHandler}
-      />
+          // submit if validation succeeds
+          const hasUnassignedRequired = fields.some(
+            (field) =>
+              !field.isOptional && fieldAssignments[field.name] === undefined
+          );
 
-      <ColumnDragObject dragState={dragState} />
-    </ImporterFrame>
+          if (!hasUnassignedRequired) {
+            onAccept();
+          } else {
+            setValidationError(l10n.requiredFieldsError);
+          }
+        }}
+        nextLabel={l10n.nextButton}
+      >
+        <Grid item xs>
+          <ColumnDragSourceArea
+            columns={columns}
+            columnPageSize={displayColumnPageSize}
+            fieldAssignments={fieldAssignments}
+            dragState={dragState}
+            eventBinder={bindDrag}
+            onSelect={columnSelectHandler}
+            onUnassign={unassignHandler}
+          />
+        </Grid>
+
+        <Grid item xs>
+          <ColumnDragTargetArea
+            hasHeaders={fileState.hasHeaders}
+            fieldRowSize={displayFieldRowSize}
+            fields={fields}
+            columns={columns}
+            fieldTouched={fieldTouched}
+            fieldAssignments={fieldAssignments}
+            dragState={dragState}
+            eventBinder={bindDrag}
+            onHover={dragHoverHandler}
+            onAssign={assignHandler}
+            onUnassign={unassignHandler}
+          />
+        </Grid>
+
+        <Grid item xs>
+          <ColumnDragObject dragState={dragState} />
+        </Grid>
+      </ImporterFrame>
+    </Grid>
   );
 };
